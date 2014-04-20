@@ -1,0 +1,45 @@
+{
+  "name":           "uupaa.messagepack.js",
+  "version":        "0.0.1",
+  "description":    "MessagePack impl",
+  "url":            "https://github.com/uupaa/MessagePack.js",
+  "keywords":       ["MessagePack", "codec", "uupaa", "WebModule"],
+  "repository": {
+    "type":         "git",
+    "url":          "https://github.com/uupaa/MessagePack.js.git"
+  },
+  "scripts": {
+    "watch":        "node node_modules/uupaa.watch.js --verbose --action build",
+    "build":        "node node_modules/uupaa.minify.js --verbose --strict --keep --pretty",
+    "build-simple": "node node_modules/uupaa.minify.js --verbose --strict --keep --pretty --nowrap --simple",
+    "build-release":"node node_modules/uupaa.minify.js --verbose --strict --module --pretty",
+    "test":         "npm run test-node; npm run test-browser",
+    "test-node":    "NODE_ENV=production NODE_PATH=lib node --harmony test/index.node.js",
+    "test-browser": "open test/index.html",
+    "lint":         "node node_modules/uupaa.plato.js; open lint/plato/index.html"
+  },
+  "x-build": {
+    "inputs":       ["lib/MessagePack.js"],
+    "output":       "release/MessagePack.min.js"
+  },
+  "dependencies": {
+    "uupaa.bytearray.js": "",
+    "uupaa.utf8.js":    ""
+
+  },
+  "devDependencies": {
+    "uupaa.console.js": "",
+    "uupaa.valid.js":   "",
+    "uupaa.help.js":    "",
+    "uupaa.task.js":    "",
+    "uupaa.test.js":    "",
+    "uupaa.watch.js":   "",
+    "uupaa.plato.js":   "",
+    "uupaa.minify.js":  ""
+  },
+  "lib":            "./lib/",
+  "main":           "./index.js",
+  "author":         "uupaa <uupaa.js@gmail.com>",
+  "license":        "MIT",
+  "contributors":   []
+}
