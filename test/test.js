@@ -1,4 +1,5 @@
 new Test().add([
+        test,
         testMessagePack_pack,
         testMessagePack_unpack,
         testPositiveFixNum,
@@ -17,6 +18,21 @@ new Test().add([
             });
         }
     });
+
+function test(next) {
+
+    var source = "Hello";
+    var pack   = MessagePack.pack(source);
+    var result = MessagePack.unpack(pack);
+
+    if (source === result) {
+        console.log("testMessagePack_pack ok");
+        next && next.pass();
+    } else {
+        console.error("testMessagePack_pack ng");
+        next && next.miss();
+    }
+}
 
 function testMessagePack_pack(next) {
 

@@ -1,6 +1,6 @@
 {
   "name":           "uupaa.messagepack.js",
-  "version":        "0.0.1",
+  "version":        "0.0.2",
   "description":    "MessagePack impl",
   "url":            "https://github.com/uupaa/MessagePack.js",
   "keywords":       ["MessagePack", "codec", "uupaa", "WebModule"],
@@ -41,5 +41,5 @@
   "main":           "./index.js",
   "author":         "uupaa <uupaa.js@gmail.com>",
   "license":        "MIT",
-  "contributors":   []
+  "contributors":   ["@edvakf"]
 }
