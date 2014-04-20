@@ -4,7 +4,7 @@ MessagePack.js
 
 ![](https://travis-ci.org/uupaa/MessagePack.js.png)
 
-MessagePack impl.
+MessagePack TypedArray version.
 
 # Document
 

@@ -1,5 +1,6 @@
 new Test().add([
-        test,
+        testString,
+        testStringCJK,
         testMessagePack_pack,
         testMessagePack_unpack,
         testPositiveFixNum,
@@ -19,17 +20,32 @@ new Test().add([
         }
     });
 
-function test(next) {
+function testString(next) {
 
     var source = "Hello";
     var pack   = MessagePack.pack(source);
     var result = MessagePack.unpack(pack);
 
     if (source === result) {
-        console.log("testMessagePack_pack ok");
+        console.log("testString ok");
         next && next.pass();
     } else {
-        console.error("testMessagePack_pack ng");
+        console.error("testString ng");
+        next && next.miss();
+    }
+}
+
+function testStringCJK(next) {
+
+    var source = "今日は海鮮丼が食べたいです";
+    var pack   = MessagePack.pack(source);
+    var result = MessagePack.unpack(pack);
+
+    if (source === result) {
+        console.log("testStringCJK ok");
+        next && next.pass();
+    } else {
+        console.error("testStringCJK ng");
         next && next.miss();
     }
 }
@@ -92,7 +108,7 @@ function testPositiveFixNum(next) {
             257: [257, [0xcd, 0x1, 0x1]],
             65534: [65534, [0xcd, 0xff, 0xfe]],
             65535: [65535, [0xcd, 0xff, 0xff]],
-            65536: [65536, [0xcd, 0xff, 0xff]],
+            65536: [65536, [0xce, 0x0, 0x1, 0x0, 0x0]],
             65537: [65537, [0xce, 0x0, 0x1, 0x0, 0x1]],
         };
     source[0x0ffffffff] = [0x0ffffffff, [0xce, 0xff, 0xff, 0xff, 0xff]];
@@ -102,8 +118,8 @@ function testPositiveFixNum(next) {
     source[0x1fffffffffffff] = [0x1fffffffffffff, [0xcf, 0x00, 0x1f, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff]];
     source[0x20000000000000] = [0x20000000000000, [0xcf, 0x00, 0x20, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00]];
     source[0x40000000000000] = [0x40000000000000, [0xcf, 0x00, 0x40, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00]];
-    source[0x80000000000000] = [0x80000000000000, []]; // Accuracy problems. IEEE754
-    source[0x7fffffffffffffff] = [0x7fffffffffffffff, []]; // Accuracy problems. IEEE754
+    source[0x80000000000000] = [0x80000000000000]; // Accuracy problems. IEEE754
+    source[0x7fffffffffffffff] = [0x7fffffffffffffff]; // Accuracy problems. IEEE754
 
     var pack = {
             0: MessagePack.pack(source[0][0]),
@@ -172,15 +188,19 @@ function testPositiveFixNum(next) {
 
     for (var key in source) {
         if (source[key][0] !== result[key]) {
+            console.log("testPositiveFixNum miss: " + key);
             ok = false;
             break;
         }
-        if (source[key][1].join() !== Array.prototype.slice.call(pack[key]).join()) {
-            ok = false;
-            break;
+        if (source[key][1]) {
+            if (source[key][1].join() !== Array.prototype.slice.call(pack[key]).join()) {
+                console.log("testPositiveFixNum miss: " + key);
+                ok = false;
+                break;
+            }
         }
     }
-    if (result) {
+    if (ok) {
         console.log("testPositiveFixNum ok");
         next && next.pass();
     } else {
@@ -305,15 +325,19 @@ function testNegativeFixNum(next) {
 
     for (var key in source) {
         if (source[key][0] !== result[key]) {
+            console.log("testNegativeFixNum miss " + key);
             ok = false;
             break;
         }
-        if (source[key][1].join() !== Array.prototype.slice.call(pack[key]).join()) {
-            ok = false;
-            break;
+        if (source[key][1]) {
+            if (source[key][1].join() !== Array.prototype.slice.call(pack[key]).join()) {
+                console.log("testNegativeFixNum miss " + key);
+                ok = false;
+                break;
+            }
         }
     }
-    if (result) {
+    if (ok) {
         console.log("testNegativeFixNum ok");
         next && next.pass();
     } else {
@@ -327,19 +351,20 @@ function testTypes(next) {
             "nil": [null, [0xc0]],
             "true": [true, [0xc3]],
             "false": [false, [0xc2]],
-            "118.625": [118.625, [203, 192, 93, 168, 0, 0, 0, 0, 0]],
+            "118.625": [118.625, [203, 64, 93, 168, 0, 0, 0, 0, 0]],
             "123.456": [123.456, [0xcb, 0x40, 0x5e, 0xdd, 0x2f, 0x1a, 0x9f, 0xbe, 0x77]],
             "-123.456": [-123.456, [0xcb, 0xc0, 0x5e, 0xdd, 0x2f, 0x1a, 0x9f, 0xbe, 0x77]],
             "0.1": [0.1, [0xcb, 0x3f, 0xb9, 0x99, 0x99, 0x99, 0x99, 0x99, 0x9a]],
             "-0.1": [-0.1, [0xcb, 0xbf, 0xb9, 0x99, 0x99, 0x99, 0x99, 0x99, 0x9a]],
-            "1.11": [1.11, [0xcb, 0xbf, 0xf1, 0xc2, 0x8f, 0x5c, 0x28, 0xf5, 0xc3]],
+            "1.11":  [1.11,  [203, 63, 241, 194, 143, 92, 40, 245, 195]],
             "-1.11": [-1.11, [0xcb, 0xbf, 0xf1, 0xc2, 0x8f, 0x5c, 0x28, 0xf5, 0xc3]],
             "3.14159565358979": [3.14159565358979, [0xcb, 0x40, 0x09, 0x21, 0xfc, 0xe6, 0xeb, 0x64, 0x22]],
             "-3.14159565358979": [-3.14159565358979, [0xcb, 0xc0, 0x09, 0x21, 0xfc, 0xe6, 0xeb, 0x64, 0x22]],
             "": ["", [0xa0]],
             "abc": ["abc", [0xa3, 0x61, 0x62, 0x63]],
             "あいう": ["あいう", [0xa9, 0xe3, 0x81, 0x82, 0xe3, 0x81, 0x84, 0xe3, 0x81, 0x86]],
-            "カルビx3, ハラミx2, ブタバラ, T-BORNx500g, ライス大盛りで": ["カルビx3, ハラミx2, ブタバラ, T-BORNx500g, ライス大盛りで", [218, 0, 55, 194, 171, 195, 171, 195, 147, 120, 51, 44, 32, 195, 143, 195, 169, 195, 159, 120, 50, 44, 32, 195, 150, 194, 191, 195, 144, 195, 169, 44, 32, 84, 45, 66, 79, 82, 78, 120, 53, 48, 48, 103, 44, 32, 195, 169, 194, 164, 194, 185, 39, 195, 155, 194, 138, 103]],
+            "カルビx3, ハラミx2, ブタバラ, T-BORNx500g, ライス大盛りで": ["カルビx3, ハラミx2, ブタバラ, T-BORNx500g, ライス大盛りで"],
+                        
             "{}": [{}, [0x80]],
             "{ 'abc': [123] }": [{ 'abc': [123] }, [0x81, 0xa3, 0x61, 0x62, 0x63, 0x91, 0x7b]],
             "{ abc: [123, 456], a: 1, b: 2, c: 3, d: 4, e: 5, f: 6, g: 7, h: 8, i: 9, j: 10, k: 11, l: 12, l: 13, m: 14, n: 15, o: 16, p: 17 }": [{ abc: [123, 456], a: 1, b: 2, c: 3, d: 4, e: 5, f: 6, g: 7, h: 8, i: 9, j: 10, k: 11, l: 12, l: 13, m: 14, n: 15, o: 16, p: 17 }, [222, 0, 17, 163, 97, 98, 99, 146, 123, 205, 1, 200, 161, 97, 1, 161, 98, 2, 161, 99, 3, 161, 100, 4, 161, 101, 5, 161, 102, 6, 161, 103, 7, 161, 104, 8, 161, 105, 9, 161, 106, 10, 161, 107, 11, 161, 108, 13, 161, 109, 14, 161, 110, 15, 161, 111, 16, 161, 112, 17]],
@@ -418,22 +443,24 @@ function testTypes(next) {
     var ok = true;
 
     for (var key in source) {
-        if (source[key][0] !== result[key]) {
+        if (JSON.stringify(source[key][0]) !== JSON.stringify(result[key])) {
+            console.log("testTypes miss " + key);
             ok = false;
             break;
         }
         if (source[key][1]) {
             if (source[key][1].join() !== Array.prototype.slice.call(pack[key]).join()) {
+                console.log("testTypes miss " + key);
                 ok = false;
                 break;
             }
         }
     }
-    if (result) {
-        console.log("testNegativeFixNum ok");
+    if (ok) {
+        console.log("testTypes ok");
         next && next.pass();
     } else {
-        console.error("testNegativeFixNum ng");
+        console.error("testTypes ng");
         next && next.miss();
     }
 }

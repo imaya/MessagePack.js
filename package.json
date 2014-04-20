@@ -1,7 +1,7 @@
 {
   "name":           "uupaa.messagepack.js",
-  "version":        "0.0.2",
-  "description":    "MessagePack impl",
+  "version":        "0.0.3",
+  "description":    "MessagePack TypedArray version.",
   "url":            "https://github.com/uupaa/MessagePack.js",
   "keywords":       ["MessagePack", "codec", "uupaa", "WebModule"],
   "repository": {
@@ -23,7 +23,7 @@
     "output":       "release/MessagePack.min.js"
   },
   "dependencies": {
-    "uupaa.bytearray.js": "",
+    "uupaa.wordarray.js": "",
     "uupaa.utf8.js":    ""
 
   },
